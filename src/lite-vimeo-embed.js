@@ -1,5 +1,9 @@
+import './lite-vimeo-embed.css';
+
 /**
- * A lightweight youtube embed. Still should feel the same to the user, just MUCH faster to initialize and paint.
+ * Ported from https://github.com/paulirish/lite-youtube-embed
+ *
+ * A lightweight vimeo embed. Still should feel the same to the user, just MUCH faster to initialize and paint.
  *
  * Thx to these as the inspiration
  *   https://storage.googleapis.com/amp-vs-non-amp/youtube-lazy.html
@@ -10,7 +14,7 @@
  *   https://github.com/Daugilas/lazyYT
  *   https://github.com/vb/lazyframe
  */
-class LiteYTEmbed extends HTMLElement {
+class LiteVimeoEmbed extends HTMLElement {
     constructor() {
         super();
 
@@ -19,41 +23,39 @@ class LiteYTEmbed extends HTMLElement {
         this.videoId = encodeURIComponent(this.getAttribute('videoid'));
 
         /**
-         * Lo, the youtube placeholder image!  (aka the thumbnail, poster image, etc)
+         * Lo, the vimeo placeholder image!  (aka the thumbnail, poster image, etc)
          * There is much internet debate on the reliability of thumbnail URLs. Weak consensus is that you
-         * cannot rely on anything and have to use the YouTube Data API.
+         * cannot rely on anything and have to use the Vimeo API.
          *
-         * amp-youtube also eschews using the API, so they just try sddefault with a hqdefault fallback:
-         *   https://github.com/ampproject/amphtml/blob/6039a6317325a8589586e72e4f98c047dbcbf7ba/extensions/amp-youtube/0.1/amp-youtube.js#L498-L537
-         * For now I'm gonna go with this confident (lol) assertion: https://stackoverflow.com/a/20542029, though I'll use `i.ytimg` to optimize for origin reuse.
-         *
-         * Worth noting that sddefault is _higher_ resolution than hqdefault. Naming is hard. ;)
-         * From my own testing, it appears that hqdefault is ALWAYS there sddefault is missing for ~10% of videos
-         *
-         * TODO: Do the sddefault->hqdefault fallback
-         *       - When doing this, apply referrerpolicy (https://github.com/ampproject/amphtml/pull/3940)
          * TODO: Consider using webp if supported, falling back to jpg
          */
-        this.posterUrl = `https://i.ytimg.com/vi/${this.videoId}/hqdefault.jpg`;
+
+        // @todo Hard code for now, need to set up the image API!!!!!!!
+        this._posterUrl = 'https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70';
+
+        // this.posterUrl = `https://i.ytimg.com/vi/${this.videoId}/hqdefault.jpg`;
         // Warm the connection for the poster image
-        LiteYTEmbed.addPrefetch('preload', this.posterUrl, 'image');
+        LiteVimeoEmbed._addPrefetch('preload', this._posterUrl, 'image');
         // TODO: support dynamically setting the attribute via attributeChangedCallback
     }
 
     connectedCallback() {
-        this.style.backgroundImage = `url("${this.posterUrl}")`;
+        this.style.backgroundImage = `url("${this._posterUrl}")`;
 
-        const playBtn = document.createElement('div');
-        playBtn.classList.add('lty-playbtn');
-        this.append(playBtn);
+        const playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.classList.add('ltv-playbtn');
+        this.appendChild(playBtn);
 
         // On hover (or tap), warm up the TCP connections we're (likely) about to use.
-        this.addEventListener('pointerover', LiteYTEmbed.warmConnections, {once: true});
+        this.addEventListener('pointerover', LiteVimeoEmbed._warmConnections, {
+            once: true
+        });
 
         // Once the user clicks, add the real iframe and drop our play button
         // TODO: In the future we could be like amp-youtube and silently swap in the iframe during idle time
         //   We'd want to only do this for in-viewport or near-viewport ones: https://github.com/ampproject/amphtml/pull/5003
-        this.addEventListener('click', e => this.addIframe());
+        this.addEventListener('click', e => this._addIframe());
     }
 
     // // TODO: Support the the user changing the [videoid] attribute
@@ -63,7 +65,7 @@ class LiteYTEmbed extends HTMLElement {
     /**
      * Add a <link rel={preload | preconnect} ...> to the head
      */
-    static addPrefetch(kind, url, as) {
+    static _addPrefetch(kind, url, as) {
         const linkElem = document.createElement('link');
         linkElem.rel = kind;
         linkElem.href = url;
@@ -71,7 +73,7 @@ class LiteYTEmbed extends HTMLElement {
             linkElem.as = as;
         }
         linkElem.crossorigin = true;
-        document.head.append(linkElem);
+        document.head.appendChild(linkElem);
     }
 
     /**
@@ -83,30 +85,30 @@ class LiteYTEmbed extends HTMLElement {
      * Maybe `<link rel=preload as=document>` would work, but it's unsupported: http://crbug.com/593267
      * But TBH, I don't think it'll happen soon with Site Isolation and split caches adding serious complexity.
      */
-    static warmConnections() {
-        if (LiteYTEmbed.preconnected) return;
+    static _warmConnections() {
+        if (LiteVimeoEmbed.preconnected) return;
 
-        // The iframe document and most of its subresources come right off youtube.com
-        LiteYTEmbed.addPrefetch('preconnect', 'https://www.youtube.com');
-        // The botguard script is fetched off from google.com
-        LiteYTEmbed.addPrefetch('preconnect', 'https://www.google.com');
+        // The iframe document and most of its subresources come right off player.vimeo.com
+        LiteVimeoEmbed._addPrefetch('preconnect', 'https://player.vimeo.com');
+        // Images
+        LiteVimeoEmbed._addPrefetch('preconnect', 'https://i.vimeocdn.com');
+        // Files .js, .css
+        LiteVimeoEmbed._addPrefetch('preconnect', 'https://f.vimeocdn.com');
+        // Metrics
+        LiteVimeoEmbed._addPrefetch('preconnect', 'https://fresnel.vimeocdn.com');
 
-        // Not certain if these ad related domains are in the critical path. Could verify with domain-specific throttling.
-        LiteYTEmbed.addPrefetch('preconnect', 'https://googleads.g.doubleclick.net');
-        LiteYTEmbed.addPrefetch('preconnect', 'https://static.doubleclick.net');
-
-        LiteYTEmbed.preconnected = true;
+        LiteVimeoEmbed.preconnected = true;
     }
 
-    addIframe(){
+    _addIframe() {
         const iframeHTML = `
-<iframe width="560" height="315" frameborder="0"
+<iframe width="640" height="360" frameborder="0"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
-  src="https://www.youtube.com/embed/${this.videoId}?autoplay=1"
+  src="https://player.vimeo.com/video/${this.videoId}?autoplay=1"
 ></iframe>`;
         this.insertAdjacentHTML('beforeend', iframeHTML);
-        this.classList.add('lyt-activated');
+        this.classList.add('ltv-activated');
     }
 }
 // Register custome element
-customElements.define('lite-youtube', LiteYTEmbed);
+customElements.define('lite-vimeo', LiteVimeoEmbed);

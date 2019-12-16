@@ -1,4 +1,6 @@
-# Lite YouTube Embed
+> 🙋 Using YouTube? Check out the original [lite-youtube-embed](https://github.com/paulirish/lite-youtube-embed).
+
+# Lite Vimeo Embed
 
 > #### Renders faster than a sneeze.
 
@@ -7,7 +9,7 @@ This custom element renders just like the real thing but approximately 224X fast
 
 ## Comparison
 
-| Normal `<iframe>` YouTube embed |  `lite-youtube` |
+| Normal `<iframe>` Vimeo embed |  `lite-vimeo` |
 |---|---|
 |  ![Screen Shot 2019-11-03 at 5 23 50 PM](https://user-images.githubusercontent.com/39191/68095560-5c930d00-fe5f-11e9-8104-e73e77a21287.png)   ![Screen Shot 2019-11-03 at 5 21 05 PM](https://user-images.githubusercontent.com/39191/68095562-5d2ba380-fe5f-11e9-8b5f-18f451b0716d.png)  ![Screen Shot 2019-11-03 at 5 19 35 PM](https://user-images.githubusercontent.com/39191/68095565-5d2ba380-fe5f-11e9-835d-85d37df71f52.png)  | ![Screen Shot 2019-11-03 at 5 23 27 PM](https://user-images.githubusercontent.com/39191/68095561-5d2ba380-fe5f-11e9-9393-e2206a64c8bf.png) ![Screen Shot 2019-11-03 at 5 20 55 PM](https://user-images.githubusercontent.com/39191/68095563-5d2ba380-fe5f-11e9-8f9a-f5c4a774cd56.png)  ![Screen Shot 2019-11-03 at 5 20 16 PM](https://user-images.githubusercontent.com/39191/68095564-5d2ba380-fe5f-11e9-908f-7e12eab8b2ad.png) |
 
@@ -15,20 +17,16 @@ This custom element renders just like the real thing but approximately 224X fast
 
 To use the custom embed you will need to:
 
-1. Include the stylesheet within your application
-1. Include the script as well
-1. Use the element `lite-youtube` markup and scripting
+1. Include the script
+1. Use the element `lite-vimeo` markup and scripting
 1. Be happy that you're providing a better user experience to your visitors
 
 ```html
-<!-- Include the stylesheet, this could be direct from the package or bundled -->
-<link rel="stylesheet" href="node_modules/lite-youtube-embed/src/lite-yt-embed.css" />
-
 <!-- Include the custom element script -->
-<script src="node_modules/lite-youtube-embed/src/lite-yt-embed.js"></script>
+<script src="http://unpkg.com/lite-vimeo-embed"></script>
 
 <!-- Use the element. You may define uses before the scripts are parsed and executed. -->
-<lite-youtube videoid="ogfYd705cRs"></lite-youtube>
+<lite-vimeo videoid="357274789"></lite-vimeo>
 ```
 
 ## Pro-usage
@@ -36,9 +34,9 @@ To use the custom embed you will need to:
 Use this as your HTML, load the script asynchronously, and let the JS progressively enhance it.
 
 ```html
-<lite-youtube videoid="ogfYd705cRs" style="background-image: url('https://i.ytimg.com/vi/ogfYd705cRs/hqdefault.jpg');">
-	<div class="lty-playbtn"></div>
-</lite-youtube>
+<lite-vimeo videoid="357274789" style="background-image: url('https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70');">
+	<div class="ltv-playbtn"></div>
+</lite-vimeo>
 ```
 
 More coming soon.

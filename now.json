@@ -1,5 +1,8 @@
 {
   "github": {
     "silent": true
+  },
+  "env": {
+    "VIMEO_TOKEN": "@vimeo-token"
   }
 }

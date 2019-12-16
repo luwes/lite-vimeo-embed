@@ -1,27 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>lite-youtube-embed - progressively enhanced</title>
+  <title>lite-vimeo-embed - progressively enhanced</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="../src/lite-yt-embed.css" />
 </head>
 <body>
 <h1>progressively enhanced</h1>
 <p>After 2 seconds, the JS is executed and custom element defined.</p>
 <p id="done">...</p>
 
-<lite-youtube videoid="ogfYd705cRs" style="background-image: url('https://i.ytimg.com/vi/ogfYd705cRs/hqdefault.jpg');">
-	<div class="lty-playbtn"></div>
-</lite-youtube>
+<lite-vimeo videoid="357274789" style="background-image: url('https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70');">
+	<div class="ltv-playbtn"></div>
+</lite-vimeo>
 
 <script>
 // artificial delay somewhat simulates a script[defer]
 setTimeout(_ => {
   const elem = document.createElement('script');
-  elem.src = '../src/lite-yt-embed.js';
+  elem.src = '../dist/lite-vimeo-embed.js';
   document.head.append(elem);
-
   document.querySelector('#done').textContent = 'Script complete.'
 }, 2000);
 </script>
