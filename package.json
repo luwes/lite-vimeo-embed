@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rollup -c --silent",
     "dev": "rollup -wc --silent",
-    "start": "http-server -c-1 -p 8000 ."
+    "start": "http-server -c-1 -p 8000"
   },
   "author": "Paul Irish",
   "contributors": [
@@ -37,6 +37,7 @@
     "http-server": "^0.12.0",
     "rollup": "^1.27.13",
     "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-copy": "^3.1.0",
     "rollup-plugin-livereload": "^1.0.4",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-postcss": "^2.0.3",
