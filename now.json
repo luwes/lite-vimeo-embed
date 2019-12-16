@@ -4,5 +4,23 @@
   },
   "env": {
     "VIMEO_TOKEN": "@vimeo-token"
-  }
+  },
+  "rewrites": [
+    { "source": "/thumb/:id", "destination": "/api/thumb.go?videoid=:id" }
+  ],
+  "headers": [
+    {
+      "source": "/thumb/(.*)",
+      "headers" : [
+        {
+          "key" : "Content-Type",
+          "value" : "application/json"
+        },
+        {
+          "key" : "Cache-Control",
+          "value" : "public, max-age=3600"
+        }
+      ]
+    }
+  ]
 }

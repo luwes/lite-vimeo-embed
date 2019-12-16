@@ -60,7 +60,7 @@ lite-vimeo:hover > .ltv-playbtn {
 lite-vimeo > .ltv-playbtn::before {
     content: '';
     border-style: solid;
-    border-width: 11px 0 11px 19px;
+    border-width: 10px 0 10px 20px;
     border-color: transparent transparent transparent #fff;
 }
 

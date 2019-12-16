@@ -28,12 +28,12 @@ class LiteVimeoEmbed extends HTMLElement {
          * cannot rely on anything and have to use the Vimeo API.
          *
          * TODO: Consider using webp if supported, falling back to jpg
+         * TODO: Use embed size for ideal thumb dimensions and quality
          */
 
-        // @todo Hard code for now, need to set up the image API!!!!!!!
-        this._posterUrl = 'https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70';
+        const api = 'https://lite-vimeo-embed.luwes.now.sh';
+        this._posterUrl = `${api}/thumb/${this.videoId}?mw=1600&mh=900&q=70`;
 
-        // this.posterUrl = `https://i.ytimg.com/vi/${this.videoId}/hqdefault.jpg`;
         // Warm the connection for the poster image
         LiteVimeoEmbed._addPrefetch('preload', this._posterUrl, 'image');
         // TODO: support dynamically setting the attribute via attributeChangedCallback
