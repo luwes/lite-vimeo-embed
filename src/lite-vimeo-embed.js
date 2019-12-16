@@ -31,7 +31,7 @@ class LiteVimeoEmbed extends HTMLElement {
          * TODO: Use embed size for ideal thumb dimensions and quality
          */
 
-        const api = 'https://lite-vimeo-embed.luwes.now.sh';
+        const api = 'https://lite-vimeo-embed.now.sh';
         this._posterUrl = `${api}/thumb/${this.videoId}?mw=1600&mh=900&q=70`;
 
         // Warm the connection for the poster image
