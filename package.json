@@ -1,6 +1,6 @@
 {
   "name": "lite-vimeo-embed",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.0",
   "description": "A faster vimeo embed.",
   "main": "dist/lite-vimeo-embed.js",
   "module": "module/lite-vimeo-embed.js",
