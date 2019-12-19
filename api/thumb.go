@@ -60,6 +60,7 @@ type Video struct {
 func Handler(w http.ResponseWriter, r *http.Request) {
 	rq := r.URL.Query()
     videoid := rq.Get("videoid")
+    imageType := rq.Get("type")
     mw := rq.Get("mw")
     mh := rq.Get("mh")
     quality := rq.Get("q")
@@ -107,7 +108,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	imageId := path.Base(video.Pictures.URI)
 
-	imageUrl, err := url.Parse(fmt.Sprintf("https://i.vimeocdn.com/video/%s.jpg", imageId))
+	imageUrl, err := url.Parse(fmt.Sprintf("https://i.vimeocdn.com/video/%s.%s", imageId, imageType))
 	if err != nil {
 		log.Fatal(err)
 	}

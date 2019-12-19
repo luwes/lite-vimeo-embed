@@ -6,16 +6,15 @@
     "VIMEO_TOKEN": "@vimeo-token"
   },
   "rewrites": [
-    { "source": "/thumb/:id", "destination": "/api/thumb.go?videoid=:id" }
+    {
+        "source": "/thumb/(\\d+).(\\w+)",
+        "destination": "/api/thumb.go?videoid=$1&type=$2"
+    }
   ],
   "headers": [
     {
-      "source": "/thumb/(.*)",
+      "source": "/thumb/(\\d+).(\\w+)",
       "headers" : [
-        {
-          "key" : "Content-Type",
-          "value" : "application/json"
-        },
         {
           "key" : "Cache-Control",
           "value" : "public, max-age=3600"

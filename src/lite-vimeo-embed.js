@@ -32,7 +32,7 @@ class LiteVimeoEmbed extends HTMLElement {
          */
 
         const api = 'https://lite-vimeo-embed.now.sh';
-        this._posterUrl = `${api}/thumb/${this.videoId}?mw=1600&mh=900&q=70`;
+        this._posterUrl = `${api}/thumb/${this.videoId}.jpg?mw=1600&mh=900&q=70`;
 
         // Warm the connection for the poster image
         LiteVimeoEmbed._addPrefetch('preload', this._posterUrl, 'image');
@@ -55,7 +55,7 @@ class LiteVimeoEmbed extends HTMLElement {
         // Once the user clicks, add the real iframe and drop our play button
         // TODO: In the future we could be like amp-youtube and silently swap in the iframe during idle time
         //   We'd want to only do this for in-viewport or near-viewport ones: https://github.com/ampproject/amphtml/pull/5003
-        this.addEventListener('click', e => this._addIframe());
+        this.addEventListener('click', () => this._addIframe());
     }
 
     // // TODO: Support the the user changing the [videoid] attribute
