@@ -7,6 +7,7 @@ import {
 import bundleSize from 'rollup-plugin-size';
 import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy';
+import cssnano from 'cssnano';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -35,7 +36,10 @@ const config = {
         bundleSize(),
         resolve(),
         postcss({
-            extensions: ['.css']
+            extensions: ['.css'],
+            plugins: [
+                cssnano()
+            ]
         }),
 
         // If we're building for production (npm run build
