@@ -51,6 +51,7 @@ lite-vimeo > .ltv-playbtn {
     transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
     outline: 0;
     border: 0;
+    cursor: pointer;
 }
 lite-vimeo:hover > .ltv-playbtn {
     background-color: rgb(0, 173, 239);
