@@ -82,9 +82,9 @@ export default [{
 
         // Watch the `public` directory and refresh the
         // browser on changes when not in production
-        !production && livereload('./')
+        !production && livereload('./public')
     ]
-}, ];
+}];
 
 function serve() {
     let started = false;
