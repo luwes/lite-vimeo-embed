@@ -1,4 +1,5 @@
-> 🙋 Using YouTube? Check out the original [lite-youtube-embed](https://github.com/paulirish/lite-youtube-embed).
+> 🙋 Using YouTube? Check out the original [lite-youtube-embed](https://github.com/paulirish/lite-youtube-embed).  
+> 🦾 Need more power? Check out [playerx](https://github.com/playerxo/playerx).
 
 # Lite Vimeo Embed
 
