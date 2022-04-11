@@ -56,6 +56,11 @@ class LiteVimeo extends HTMLElement {
         const devicePixelRatio = window.devicePixelRatio || 1;
         width *= devicePixelRatio;
         height *= devicePixelRatio;
+        
+        /**
+         * Thumbnail fetching and comments below are originally
+         * from https://github.com/slightlyoff/lite-vimeo
+         */
 
         // API is the video-id based
         // http://vimeo.com/api/v2/video/364402896.json
