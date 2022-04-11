@@ -76,7 +76,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		Timeout: time.Second * 2, // Maximum of 2 secs
 	}
 
-	req, err := http.NewRequest(http.MethodGet, apiUrl, nil)
+	req, err := http.NewRequest(http.MethodGet, apiUrl, nil) 
 	if err != nil {
 		log.Fatal(err)
 	}

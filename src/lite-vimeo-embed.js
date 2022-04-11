@@ -21,23 +21,12 @@ class LiteVimeo extends HTMLElement {
         // TODO: support dynamically setting the attribute via attributeChangedCallback
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         // Gotta encode the untrusted value
         // https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#rule-2---attribute-escape-before-inserting-untrusted-data-into-html-common-attributes
         this.videoId = encodeURIComponent(this.getAttribute('videoid'));
 
-        /**
-         * Lo, the vimeo placeholder image!  (aka the thumbnail, poster image, etc)
-         * We have to use the Vimeo API.
-         */
-        let { width, height } = getThumbnailDimensions(this.getBoundingClientRect());
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        width *= devicePixelRatio;
-        height *= devicePixelRatio;
-
-        let thumbnailUrl = `https://lite-vimeo-embed.now.sh/thumb/${this.videoId}`;
-        thumbnailUrl += `.${canUseWebP() ? 'webp' : 'jpg'}`;
-        thumbnailUrl += `?mw=${width}&mh=${height}&q=${devicePixelRatio > 1 ? 70 : 85}`;
+        const thumbnailUrl = await this._getThumbnailURL()
 
         this.style.backgroundImage = `url("${thumbnailUrl}")`;
 
@@ -55,6 +44,36 @@ class LiteVimeo extends HTMLElement {
         // TODO: In the future we could be like amp-youtube and silently swap in the iframe during idle time
         //   We'd want to only do this for in-viewport or near-viewport ones: https://github.com/ampproject/amphtml/pull/5003
         this.addEventListener('click', () => this._addIframe());
+    }
+
+    async _getThumbnailURL() {
+
+        /**
+         * Lo, the vimeo placeholder image!  (aka the thumbnail, poster image, etc)
+         * We have to use the Vimeo API.
+         */
+        let { width, height } = getThumbnailDimensions(this.getBoundingClientRect());
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        width *= devicePixelRatio;
+        height *= devicePixelRatio;
+
+        // API is the video-id based
+        // http://vimeo.com/api/v2/video/364402896.json
+        const apiUrl = `https://vimeo.com/api/v2/video/${this.videoId}.json`;
+
+        // Now fetch the JSON that locates our placeholder from vimeo's JSON API
+        const apiResponse = (await (await fetch(apiUrl)).json())[0];
+
+        // Extract the image id, e.g. 819916979, from a URL like:
+        // thumbnail_large: "https://i.vimeocdn.com/video/819916979_640.jpg"
+        const tnLarge = apiResponse.thumbnail_large;
+        const imgId = (tnLarge.substr(tnLarge.lastIndexOf("/") + 1)).split("_")[0];
+
+        let thumbnailUrl = `https://i.vimeocdn.com/video/${imgId}`;
+        thumbnailUrl += `.${canUseWebP() ? 'webp' : 'jpg'}`;
+        thumbnailUrl += `?mw=${width}&mh=${height}&q=${devicePixelRatio > 1 ? 70 : 85}`;
+
+        return thumbnailUrl
     }
 
     // // TODO: Support the the user changing the [videoid] attribute
