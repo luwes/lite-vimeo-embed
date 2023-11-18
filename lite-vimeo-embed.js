@@ -120,6 +120,7 @@ class LiteVimeo extends HTMLElement {
 
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
+    playBtn.setAttribute('aria-label', 'Play video');
     playBtn.classList.add('ltv-playbtn');
     this.appendChild(playBtn);
 
