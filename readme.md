@@ -36,7 +36,7 @@ Use this as your HTML, load the script asynchronously, and let the JS progressiv
 
 ```html
 <lite-vimeo videoid="357274789" style="background-image: url('https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70');">
-	<div class="ltv-playbtn"></div>
+  <div class="ltv-playbtn"></div>
 </lite-vimeo>
 ```
 
