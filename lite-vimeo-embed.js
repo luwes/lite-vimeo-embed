@@ -107,9 +107,6 @@ class LiteVimeo extends HTMLElement {
 
     const oEmbedUrl = new URL('https://api.playerx.io/oembed');
     oEmbedUrl.searchParams.set('url', `https://vimeo.com/${this.videoId}`);
-    oEmbedUrl.searchParams.set('maxwidth', width);
-    oEmbedUrl.searchParams.set('maxheight', height);
-    oEmbedUrl.searchParams.set('responsive', true);
     oEmbedUrl.searchParams.set('fields', 'thumbnail_url');
 
     fetch(oEmbedUrl)
@@ -120,12 +117,6 @@ class LiteVimeo extends HTMLElement {
 
         this.style.backgroundImage = `url("${thumbnailUrl}")`;
       });
-
-    // let thumbnailUrl = `https://lite-vimeo-embed.now.sh/thumb/${this.videoId}`;
-    // thumbnailUrl += `.${canUseWebP() ? 'webp' : 'jpg'}`;
-    // thumbnailUrl += `?mw=${width}&mh=${height}&q=${devicePixelRatio > 1 ? 70 : 85}`;
-
-    // this.style.backgroundImage = `url("${thumbnailUrl}")`;
 
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
@@ -197,18 +188,6 @@ export function addPrefetch(kind, url, as) {
   }
   linkElem.crossorigin = true;
   document.head.appendChild(linkElem);
-}
-
-export function canUseWebP() {
-  var elem = document.createElement('canvas');
-
-  if (elem.getContext && elem.getContext('2d')) {
-    // was able or not to get WebP representation
-    return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-  }
-
-  // very old browser like IE 8, canvas not supported
-  return false;
 }
 
 /**
