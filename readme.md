@@ -24,7 +24,7 @@ To use the custom embed you will need to:
 
 ```html
 <!-- Include the custom element script -->
-<script src="http://unpkg.com/lite-vimeo-embed"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/lite-vimeo-embed/+esm"></script>
 
 <!-- Use the element. You may define uses before the scripts are parsed and executed. -->
 <lite-vimeo videoid="357274789"></lite-vimeo>
@@ -39,5 +39,3 @@ Use this as your HTML, load the script asynchronously, and let the JS progressiv
   <div class="ltv-playbtn"></div>
 </lite-vimeo>
 ```
-
-More coming soon.
