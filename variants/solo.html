@@ -3,13 +3,22 @@
   <head>
     <title>lite-vimeo-embed</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      lite-vimeo {
+        display: block;
+        aspect-ratio: 16 / 9;
+        max-width: 640px;
+      }
+    </style>
+    <script type="module" src="../lite-vimeo-embed.js"></script>
   </head>
   <body>
     <h1><code>lite-vimeo</code> custom element</h1>
 
     <lite-vimeo videoid="357274789"></lite-vimeo>
 
-    <script type="module" src="../lite-vimeo-embed.js"></script>
+    <br>
+    <a href="../">Back to index</a>
   </body>
 </html>

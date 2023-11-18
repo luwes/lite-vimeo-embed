@@ -2,16 +2,29 @@
 <html lang="en">
   <head>
     <title>lite-vimeo-embed - progressively enhanced</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      lite-vimeo {
+        display: block;
+        aspect-ratio: 16 / 9;
+        max-width: 640px;
+      }
+    </style>
   </head>
   <body>
     <h1>progressively enhanced</h1>
     <p>After 2 seconds, the JS is executed and custom element defined.</p>
     <p id="done">...</p>
 
-    <lite-vimeo videoid="357274789" style="background-image: url('https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70');">
-      <div class="ltv-playbtn"></div>
-    </lite-vimeo>
+    <lite-vimeo
+      videoid="357274789"
+      style="
+        background: center / cover url('https://i.vimeocdn.com/video/810965406-a3ff82ba6dcf55973dcc42f561664c4275594fb2505f849e27da7672795a288d-d_1280');
+      "
+    ></lite-vimeo>
+
+    <br>
+    <a href="../">Back to index</a>
 
     <script>
       // artificial delay somewhat simulates a script[defer]

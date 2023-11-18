@@ -11,25 +11,6 @@ style.textContent = /*css*/`
     cursor: pointer;
   }
 
-  /* gradient, vimeo doesn't have this */
-
-  /*lite-vimeo::before {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 0;
-      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAADGCAYAAAAT+OqFAAAAdklEQVQoz42QQQ7AIAgEF/T/D+kbq/RWAlnQyyazA4aoAB4FsBSA/bFjuF1EOL7VbrIrBuusmrt4ZZORfb6ehbWdnRHEIiITaEUKa5EJqUakRSaEYBJSCY2dEstQY7AuxahwXFrvZmWl2rh4JZ07z9dLtesfNj5q0FU3A5ObbwAAAABJRU5ErkJggg==);
-      background-position: top;
-      background-repeat: repeat-x;
-      height: 60px;
-      padding-bottom: 50px;
-      width: 100%;
-      transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  }*/
-
-  /* responsive iframe with a 16:9 aspect ratio
-      thanks https://css-tricks.com/responsive-iframes/
-  */
   lite-vimeo::after {
     content: "";
     display: block;
@@ -46,6 +27,8 @@ style.textContent = /*css*/`
 
   /* play button */
   lite-vimeo > .ltv-playbtn {
+    appearance: none;
+    padding: 0;
     width: 6.5em;
     height: 4em;
     background: rgba(23, 35, 34, .75);
@@ -71,7 +54,8 @@ style.textContent = /*css*/`
     border-color: transparent transparent transparent #fff;
   }
 
-  lite-vimeo > .ltv-playbtn, lite-vimeo > .ltv-playbtn::before {
+  lite-vimeo > .ltv-playbtn,
+  lite-vimeo > .ltv-playbtn::before {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -83,7 +67,8 @@ style.textContent = /*css*/`
     cursor: unset;
   }
 
-  lite-vimeo.ltv-activated::before, lite-vimeo.ltv-activated > .ltv-playbtn {
+  lite-vimeo.ltv-activated::before,
+  lite-vimeo.ltv-activated > .ltv-playbtn {
     opacity: 0;
     pointer-events: none;
   }
@@ -115,15 +100,32 @@ class LiteVimeo extends HTMLElement {
      * We have to use the Vimeo API.
      */
     let { width, height } = getThumbnailDimensions(this.getBoundingClientRect());
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    width *= devicePixelRatio;
-    height *= devicePixelRatio;
+    let devicePixelRatio = window.devicePixelRatio || 1;
+    if (devicePixelRatio >= 2) devicePixelRatio *= .75;
+    width = Math.round(width * devicePixelRatio);
+    height = Math.round(height * devicePixelRatio);
 
-    let thumbnailUrl = `https://lite-vimeo-embed.now.sh/thumb/${this.videoId}`;
-    thumbnailUrl += `.${canUseWebP() ? 'webp' : 'jpg'}`;
-    thumbnailUrl += `?mw=${width}&mh=${height}&q=${devicePixelRatio > 1 ? 70 : 85}`;
+    const oEmbedUrl = new URL('https://api.playerx.io/oembed');
+    oEmbedUrl.searchParams.set('url', `https://vimeo.com/${this.videoId}`);
+    oEmbedUrl.searchParams.set('maxwidth', width);
+    oEmbedUrl.searchParams.set('maxheight', height);
+    oEmbedUrl.searchParams.set('responsive', true);
+    oEmbedUrl.searchParams.set('fields', 'thumbnail_url');
 
-    this.style.backgroundImage = `url("${thumbnailUrl}")`;
+    fetch(oEmbedUrl)
+      .then(response => response.json())
+      .then(data => {
+        let thumbnailUrl = data.thumbnail_url;
+        thumbnailUrl = thumbnailUrl.replace(/-d_[\dx]+$/i, `-d_${width}x${height}`);
+
+        this.style.backgroundImage = `url("${thumbnailUrl}")`;
+      });
+
+    // let thumbnailUrl = `https://lite-vimeo-embed.now.sh/thumb/${this.videoId}`;
+    // thumbnailUrl += `.${canUseWebP() ? 'webp' : 'jpg'}`;
+    // thumbnailUrl += `?mw=${width}&mh=${height}&q=${devicePixelRatio > 1 ? 70 : 85}`;
+
+    // this.style.backgroundImage = `url("${thumbnailUrl}")`;
 
     const playBtn = document.createElement('button');
     playBtn.type = 'button';
