@@ -18,11 +18,11 @@ style.textContent = /*css*/`
     position: absolute;
     top: 0;
     left: 0;
+    border: 0;
   }
 
   lite-vimeo > .ltv-playbtn {
     font-size: 10px;
-    appearance: none;
     padding: 0;
     width: 6.5em;
     height: 4em;
@@ -154,19 +154,26 @@ class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
     // Once the user clicks, add the real iframe and drop our play button
     // TODO: In the future we could be like amp-youtube and silently swap in the iframe during idle time
     //   We'd want to only do this for in-viewport or near-viewport ones: https://github.com/ampproject/amphtml/pull/5003
-    this.addEventListener('click', () => this._addIframe());
+    this.addEventListener('click', this.addIframe);
   }
 
-  _addIframe() {
+  addIframe() {
     if (this.classList.contains('ltv-activated')) return;
     this.classList.add('ltv-activated');
 
-    const iframeHTML = /*html*/`
-<iframe width="640" height="360" frameborder="0"
-  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
-  src="https://player.vimeo.com/video/${this.videoId}?autoplay=1"
-></iframe>`;
-    this.insertAdjacentHTML('beforeend', iframeHTML);
+    const iframeEl = document.createElement('iframe');
+    iframeEl.width = 640;
+    iframeEl.height = 360;
+    // No encoding necessary as [title] is safe. https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#:~:text=Safe%20HTML%20Attributes%20include
+    iframeEl.title = this.playLabel;
+    iframeEl.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    // AFAIK, the encoding here isn't necessary for XSS, but we'll do it only because this is a URL
+    // https://stackoverflow.com/q/64959723/89484
+    iframeEl.src = `https://player.vimeo.com/video/${encodeURIComponent(this.videoId)}?autoplay=1`;
+    this.append(iframeEl);
+
+    // Set focus for a11y
+    iframeEl.addEventListener('load', iframeEl.focus, { once: true });
   }
 }
 
