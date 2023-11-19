@@ -1,7 +1,8 @@
 const style = document.head.appendChild(document.createElement('style'));
 style.textContent = /*css*/`
+
   lite-vimeo {
-    font-size: 10px;
+    aspect-ratio: 16 / 9;
     background-color: #000;
     position: relative;
     display: block;
@@ -9,12 +10,6 @@ style.textContent = /*css*/`
     background-position: center center;
     background-size: cover;
     cursor: pointer;
-  }
-
-  lite-vimeo::after {
-    content: "";
-    display: block;
-    padding-bottom: calc(100% / (16 / 9));
   }
 
   lite-vimeo > iframe {
@@ -25,17 +20,17 @@ style.textContent = /*css*/`
     left: 0;
   }
 
-  /* play button */
   lite-vimeo > .ltv-playbtn {
+    font-size: 10px;
     appearance: none;
     padding: 0;
     width: 6.5em;
     height: 4em;
     background: rgba(23, 35, 34, .75);
     z-index: 1;
-    opacity: 0.8;
-    border-radius: .5em; /* TODO: Consider replacing this with YT's actual svg. Eh. */
-    transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+    opacity: .8;
+    border-radius: .5em;
+    transition: opacity .2s cubic-bezier(0, 0, .2, 1);
     outline: 0;
     border: 0;
     cursor: pointer;
@@ -88,12 +83,32 @@ style.textContent = /*css*/`
  *   https://github.com/Daugilas/lazyYT
  *   https://github.com/vb/lazyframe
  */
-class LiteVimeo extends HTMLElement {
+class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
+  /**
+   * Begin pre-connecting to warm up the iframe load
+   * Since the embed's network requests load within its iframe,
+   *   preload/prefetch'ing them outside the iframe will only cause double-downloads.
+   * So, the best we can do is warm up a few connections to origins that are in the critical path.
+   *
+   * Maybe `<link rel=preload as=document>` would work, but it's unsupported: http://crbug.com/593267
+   * But TBH, I don't think it'll happen soon with Site Isolation and split caches adding serious complexity.
+   */
+  static _warmConnections() {
+    if (LiteVimeo.preconnected) return;
+    LiteVimeo.preconnected = true;
+
+    // The iframe document and most of its subresources come right off player.vimeo.com
+    addPrefetch('preconnect', 'https://player.vimeo.com');
+    // Images
+    addPrefetch('preconnect', 'https://i.vimeocdn.com');
+    // Files .js, .css
+    addPrefetch('preconnect', 'https://f.vimeocdn.com');
+    // Metrics
+    addPrefetch('preconnect', 'https://fresnel.vimeocdn.com');
+  }
 
   connectedCallback() {
-    // Gotta encode the untrusted value
-    // https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#rule-2---attribute-escape-before-inserting-untrusted-data-into-html-common-attributes
-    this.videoId = encodeURIComponent(this.getAttribute('videoid'));
+    this.videoId = this.getAttribute('videoid');
 
     /**
      * Lo, the vimeo placeholder image!  (aka the thumbnail, poster image, etc)
@@ -118,11 +133,18 @@ class LiteVimeo extends HTMLElement {
         this.style.backgroundImage = `url("${thumbnailUrl}")`;
       });
 
-    const playBtn = document.createElement('button');
-    playBtn.type = 'button';
-    playBtn.setAttribute('aria-label', 'Play video');
-    playBtn.classList.add('ltv-playbtn');
-    this.appendChild(playBtn);
+    let playBtnEl = this.querySelector('.ltv-playbtn');
+    // A label for the button takes priority over a [playlabel] attribute on the custom-element
+    this.playLabel = (playBtnEl && playBtnEl.textContent.trim()) || this.getAttribute('playlabel') || 'Play video';
+
+    if (!playBtnEl) {
+      playBtnEl = document.createElement('button');
+      playBtnEl.type = 'button';
+      playBtnEl.setAttribute('aria-label', this.playLabel);
+      playBtnEl.classList.add('ltv-playbtn');
+      this.append(playBtnEl);
+    }
+    playBtnEl.removeAttribute('href');
 
     // On hover (or tap), warm up the TCP connections we're (likely) about to use.
     this.addEventListener('pointerover', LiteVimeo._warmConnections, {
@@ -135,52 +157,27 @@ class LiteVimeo extends HTMLElement {
     this.addEventListener('click', () => this._addIframe());
   }
 
-  // // TODO: Support the the user changing the [videoid] attribute
-  // attributeChangedCallback() {
-  // }
-
-  /**
-   * Begin pre-connecting to warm up the iframe load
-   * Since the embed's network requests load within its iframe,
-   *   preload/prefetch'ing them outside the iframe will only cause double-downloads.
-   * So, the best we can do is warm up a few connections to origins that are in the critical path.
-   *
-   * Maybe `<link rel=preload as=document>` would work, but it's unsupported: http://crbug.com/593267
-   * But TBH, I don't think it'll happen soon with Site Isolation and split caches adding serious complexity.
-   */
-  static _warmConnections() {
-    if (LiteVimeo.preconnected) return;
-
-    // The iframe document and most of its subresources come right off player.vimeo.com
-    addPrefetch('preconnect', 'https://player.vimeo.com');
-    // Images
-    addPrefetch('preconnect', 'https://i.vimeocdn.com');
-    // Files .js, .css
-    addPrefetch('preconnect', 'https://f.vimeocdn.com');
-    // Metrics
-    addPrefetch('preconnect', 'https://fresnel.vimeocdn.com');
-
-    LiteVimeo.preconnected = true;
-  }
-
   _addIframe() {
-    const iframeHTML = `
+    if (this.classList.contains('ltv-activated')) return;
+    this.classList.add('ltv-activated');
+
+    const iframeHTML = /*html*/`
 <iframe width="640" height="360" frameborder="0"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
   src="https://player.vimeo.com/video/${this.videoId}?autoplay=1"
 ></iframe>`;
     this.insertAdjacentHTML('beforeend', iframeHTML);
-    this.classList.add('ltv-activated');
   }
 }
 
-customElements.define('lite-vimeo', LiteVimeo);
-
+if (globalThis.customElements && !globalThis.customElements.get('lite-vimeo')) {
+  globalThis.customElements.define('lite-vimeo', LiteVimeo);
+}
 
 /**
  * Add a <link rel={preload | preconnect} ...> to the head
  */
-export function addPrefetch(kind, url, as) {
+function addPrefetch(kind, url, as) {
   const linkElem = document.createElement('link');
   linkElem.rel = kind;
   linkElem.href = url;
@@ -188,7 +185,7 @@ export function addPrefetch(kind, url, as) {
     linkElem.as = as;
   }
   linkElem.crossorigin = true;
-  document.head.appendChild(linkElem);
+  document.head.append(linkElem);
 }
 
 /**
@@ -199,10 +196,7 @@ export function addPrefetch(kind, url, as) {
  * @param {number} options.height The height of the player
  * @return {Object} The width and height
  */
-export function getThumbnailDimensions({
-  width,
-  height
-}) {
+function getThumbnailDimensions({ width, height }) {
   let roundedWidth = width;
   let roundedHeight = height;
 
