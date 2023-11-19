@@ -30,7 +30,7 @@ style.textContent = /*css*/`
     z-index: 1;
     opacity: .8;
     border-radius: .5em;
-    transition: opacity .2s cubic-bezier(0, 0, .2, 1);
+    transition: opacity .2s ease-out, background .2s ease-out;
     outline: 0;
     border: 0;
     cursor: pointer;
