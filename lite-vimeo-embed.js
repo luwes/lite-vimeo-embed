@@ -120,16 +120,11 @@ class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
     width = Math.round(width * devicePixelRatio);
     height = Math.round(height * devicePixelRatio);
 
-    const oEmbedUrl = new URL('https://api.playerx.io/oembed');
-    oEmbedUrl.searchParams.set('url', `https://vimeo.com/${this.videoId}`);
-    oEmbedUrl.searchParams.set('fields', 'thumbnail_url');
-
-    fetch(oEmbedUrl)
+    fetch(`https://vimeo.com/api/v2/video/${this.videoId}.json`)
       .then(response => response.json())
       .then(data => {
-        let thumbnailUrl = data.thumbnail_url;
+        let thumbnailUrl = data[0].thumbnail_large;
         thumbnailUrl = thumbnailUrl.replace(/-d_[\dx]+$/i, `-d_${width}x${height}`);
-
         this.style.backgroundImage = `url("${thumbnailUrl}")`;
       });
 
