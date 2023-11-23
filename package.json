@@ -6,6 +6,7 @@
   "main": "lite-vimeo-embed.js",
   "files": [],
   "scripts": {
+    "lint": "npx eslint *.js -c ./node_modules/wet-run/.eslintrc.json",
     "dev": "wet serve"
   },
   "author": "Wesley Luyten <me@wesleyluyten.com> (https://wesleyluyten.com)",
