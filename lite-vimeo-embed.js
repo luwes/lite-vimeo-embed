@@ -83,7 +83,7 @@ style.textContent = /*css*/`
  *   https://github.com/Daugilas/lazyYT
  *   https://github.com/vb/lazyframe
  */
-class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
+class LiteVimeo extends (globalThis.HTMLElement ?? class { }) {
   /**
    * Begin pre-connecting to warm up the iframe load
    * Since the embed's network requests load within its iframe,
@@ -164,7 +164,11 @@ class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
     iframeEl.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
     // AFAIK, the encoding here isn't necessary for XSS, but we'll do it only because this is a URL
     // https://stackoverflow.com/q/64959723/89484
-    iframeEl.src = `https://player.vimeo.com/video/${encodeURIComponent(this.videoId)}?autoplay=1`;
+
+    // Check if is a unlisted video with two part videoId
+    const encodedVideoId = this.videoId.includes('/') ? this.videoId.split('/').map(encodeURIComponent).join('?h=') : encodeURIComponent(input);
+
+    iframeEl.src = `https://player.vimeo.com/video/${encodedVideoId}?autoplay=1`;
     this.append(iframeEl);
 
     // Set focus for a11y
