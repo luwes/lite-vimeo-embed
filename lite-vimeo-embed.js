@@ -156,15 +156,20 @@ class LiteVimeo extends (globalThis.HTMLElement ?? class {}) {
     if (this.classList.contains('ltv-activated')) return;
     this.classList.add('ltv-activated');
 
+    const params = new URLSearchParams(this.getAttribute('params') || []);
+    params.append('autoplay', '1');
+    params.append('playsinline', '1');
+
     const iframeEl = document.createElement('iframe');
     iframeEl.width = 640;
     iframeEl.height = 360;
     // No encoding necessary as [title] is safe. https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#:~:text=Safe%20HTML%20Attributes%20include
     iframeEl.title = this.playLabel;
     iframeEl.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    iframeEl.allowFullscreen = true;
     // AFAIK, the encoding here isn't necessary for XSS, but we'll do it only because this is a URL
     // https://stackoverflow.com/q/64959723/89484
-    iframeEl.src = `https://player.vimeo.com/video/${encodeURIComponent(this.videoId)}?autoplay=1`;
+    iframeEl.src = `https://player.vimeo.com/video/${encodeURIComponent(this.videoId)}?${params.toString()}`;
     this.append(iframeEl);
 
     // Set focus for a11y
